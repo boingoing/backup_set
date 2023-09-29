@@ -1,3 +1,5 @@
+[![main build status](https://app.travis-ci.com/boingoing/backup_set.svg?branch=main)](https://app.travis-ci.com/github/boingoing/backup_set/builds)
+
 ## What is this?
 
 A tool for computing the set of files missing between two backup sets and related code for reading, writing, and comparing such backup sets.
