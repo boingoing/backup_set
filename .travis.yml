@@ -1,0 +1,20 @@
+language: cpp
+
+script:
+- mkdir build && cd ./build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && ./test_runner
+
+dist: focal
+
+matrix:
+  include:
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-focal-15
+        packages:
+          - libstdc++-7-dev
+          - clang-tidy
+          - clang-format-12
