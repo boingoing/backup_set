@@ -35,6 +35,21 @@ There are two binaries which are defined in this repo.
   * Supports a `--old filename` flag to choose the name of file containing the old backup set (Default: Old.sha1.txt)
   * Supports a `--writefiles` flag to control writing the set of missing filenames to output files. Otherwise the sets are written to the console.
 
+## Testing
+
+```console
+> test_runner
+Simple unit test runner
+
+Running BackupSetTest tests...
+
+Total tests: 8
+Passed tests: 8
+Failed tests: 0
+Disabled tests: 0
+Skipped tests: 0
+```
+
 ## Using
 
 `Old.sha1.txt:`
