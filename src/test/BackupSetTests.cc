@@ -46,6 +46,10 @@ std::vector<BackupSetTestData> backup_set_tests = {
   {{"33333", "c:\\temp\\another thing.pdf"},{"11111", "c:\\temp\\something.pdf"}},
   {"c:\\temp\\something else.pdf"},
   {"c:\\temp\\another thing.pdf"}},
+  {{{"11111", "c:\\temp\\something.pdf"},{"22222", "c:\\temp\\something else.pdf"}},
+  {{"33333", "c:\\temp\\another thing.pdf"},{"11111", "c:\\temp\\not the same something.pdf"}},
+  {"c:\\temp\\something else.pdf"},
+  {"c:\\temp\\another thing.pdf"}},
 };
 
 class BackupSetTest : public TestCase {};
