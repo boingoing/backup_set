@@ -27,7 +27,7 @@ This repo includes a cmake definition. It has been tested on Windows, linux, and
 ## Running
 
 There are two binaries which are defined in this repo.
-* `test_runner` is a simple unit test runner which contains tests for the backup set implementation and runs defined unit tests.
+* `test_runner` is a simple unit test runner which contains and runs unit tests for the backup set implementation.
   * Supports a `--verbose` flag to control outputting a verbose trace log.
   * Supports a `--filter string` flag to control which unit tests are run. Filter strings are case-sensitive.
 * `backup_set_compare` is a tool which can compute the set of files missing between old and new backup sets.
