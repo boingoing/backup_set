@@ -10,6 +10,8 @@ A backup set is defined as a file where each line contains a 40-digit sha1 hash 
 3333333333333333333333333333333333333333 c:\file 3.txt
 ```
 
+Files are identified and compared by their sha1 hash and their filename itself is arbitrary. A file with the same sha1 hash in both backup sets will be considered as the same file, regardless of the filenames of both files. Two files with the same filename but different sha1 hash are considered to be different files.
+
 ## Building
 
 This repo includes a cmake definition. It has been tested on Windows, linux, and MacOS.
@@ -32,3 +34,31 @@ There are two binaries which are defined in this repo.
   * Supports a `--new filename` flag to choose the name of file containing the new backup set (Default: New.sha1.txt)
   * Supports a `--old filename` flag to choose the name of file containing the old backup set (Default: Old.sha1.txt)
   * Supports a `--writefiles` flag to control writing the set of missing filenames to output files. Otherwise the sets are written to the console.
+
+## Using
+
+`Old.sha1.txt:`
+```console
+1111111111111111111111111111111111111111 c:\file 1.txt
+2222222222222222222222222222222222222222 c:\file 2.txt
+3333333333333333333333333333333333333333 c:\file 3.txt
+```
+`New.sha1.txt:`
+```console
+2222222222222222222222222222222222222222 c:\file 2.txt
+3333333333333333333333333333333333333333 c:\file 3.txt
+4444444444444444444444444444444444444444 c:\file 4.txt
+```
+
+```console
+> backup_set_compare --new New.sha1.txt --old Old.sha1.txt
+Backup set comparer. Determine which files are missing between two backup sets.
+
+Files found in new but not present in old (NewNotInOld):
+c:\file 4.txt
+
+Files found in old but not present in new (OldNotInNew):
+c:\file 1.txt
+
+Done
+```
