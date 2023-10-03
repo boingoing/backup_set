@@ -33,9 +33,11 @@ There are two binaries which are defined in this repo.
   * Supports a `--verbose` flag to control outputting a verbose trace log.
   * Supports a `--filter string` flag to control which unit tests are run. Filter strings are case-sensitive.
 * `backup_set_compare` is a tool which can compute the set of files missing between old and new backup sets.
-  * Supports a `--new filename` flag to choose the name of file containing the new backup set (Default: New.sha1.txt)
-  * Supports a `--old filename` flag to choose the name of file containing the old backup set (Default: Old.sha1.txt)
+  * Supports a `--new filename` flag to choose the name of file containing the new backup set (Default: New.sha1.txt).
+  * Supports a `--old filename` flag to choose the name of file containing the old backup set (Default: Old.sha1.txt).
   * Supports a `--writefiles` flag to control writing the set of missing filenames to output files. Otherwise the sets are written to the console.
+  * Supports a `--validate` flag to enable validation of the backup set input files. When passsed, verifies that the sha1hash values are 40 valid hex-characters. Otherwise the sha1hash is treated as a unique string value.
+    * Note: Lines in the input file which contain invalid sha1hash strings are ignored but no error is generated.
 
 ## Testing
 
