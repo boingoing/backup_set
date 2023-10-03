@@ -18,13 +18,19 @@ class BackupSet;
 class BackupSetReader {
  private:
   BackupSet& backup_set_;
+  bool should_validate_ = false;
 
  public:
   BackupSetReader() = delete;
   explicit BackupSetReader(BackupSet& backup_set);
   ~BackupSetReader() = default;
 
+  // Read lines from the input stream and store file information into the
+  // BackupSet.
   void read(std::istream& is);
+
+  // Enable validation of the input stream while reading.
+  void enableValidation();
 };
 
 #endif  // __BackupSetReader_h__

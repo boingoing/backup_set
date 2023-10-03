@@ -20,22 +20,27 @@ constexpr const auto DefaultNewFilename = "New.sha1.txt";
 constexpr const auto DefaultOldFilename = "Old.sha1.txt";
 constexpr const auto DefaultNewNotInOldFilename = "NewNotInOld.txt";
 constexpr const auto DefaultOldNotInNewFilename = "OldNotInNew.txt";
+constexpr const auto DefaultWriteFilesFlag = false;
+constexpr const auto DefaultValidateInputFlag = false;
 
 struct Options {
   std::string new_filename = DefaultNewFilename;
   std::string old_filename = DefaultOldFilename;
-  bool write_files = false;
+  bool write_files = DefaultWriteFilesFlag;
+  bool validate_input = DefaultValidateInputFlag;
 };
 
 void printHelp() {
-  std::cout << "Usage: backup_set_compare [--new filename] [--old filename] [--writefiles]" << std::endl << std::endl;
+  std::cout << "Usage: backup_set_compare [--new filename] [--old filename] [--writefiles] [--validate]" << std::endl << std::endl;
   std::cout << "Options:" << std::endl;
   std::cout << std::setw(2) << "" << std::left << std::setw(16) << "--new filename";
-  std::cout << "Load the new backup set from filename (Default: " << std::quoted(DefaultNewFilename) << ")" << std::endl;
+  std::cout << "Load the new backup set from filename (Default: " << std::quoted(DefaultNewFilename) << ")." << std::endl;
   std::cout << std::setw(2) << "" << std::left << std::setw(16) << "--old filename";
-  std::cout << "Load the old backup set from filename (Default: " << std::quoted(DefaultOldFilename) << ")" << std::endl;
+  std::cout << "Load the old backup set from filename (Default: " << std::quoted(DefaultOldFilename) << ")." << std::endl;
   std::cout << std::setw(2) << "" << std::left << std::setw(16) << "--writefiles";
-  std::cout << "Write the sets of missing files between old and new backup sets to files." << std::endl;
+  std::cout << "Write the sets of missing files between old and new backup sets to files (Default: off)." << std::endl;
+  std::cout << std::setw(2) << "" << std::left << std::setw(16) << "--validate";
+  std::cout << "Validate the backup set loaded from files (Default: off)." << std::endl;
   std::cout << std::setw(2) << "" << std::left << std::setw(16) << "--help";
   std::cout << "Display this usage information" << std::endl;
 }
@@ -57,6 +62,8 @@ void parseArgs(const Args& args, Options& options) {
       options.old_filename = *iter;
     } else if (arg == "--writefiles") {
       options.write_files = true;
+    } else if (arg == "--validate") {
+      options.validate_input = true;
     } else if (arg == "--help") {
       printHelp();
       exit(0);
@@ -68,8 +75,12 @@ void parseArgs(const Args& args, Options& options) {
   }
 }
 
-void readFromFile(BackupSet& backup_set, const std::string& filename) {
+void readFromFile(BackupSet& backup_set, const std::string& filename, bool validate = false) {
   BackupSetReader reader(backup_set);
+  if (validate) {
+    reader.enableValidation();
+  }
+
   std::ifstream ifs;
   ifs.open(filename, std::ifstream::in);
   reader.read(ifs);
@@ -103,8 +114,8 @@ int main(int argc, const char** argv) {
 
   BackupSet new_set;
   BackupSet old_set;
-  readFromFile(new_set, options.new_filename);
-  readFromFile(old_set, options.old_filename);
+  readFromFile(new_set, options.new_filename, options.validate_input);
+  readFromFile(old_set, options.old_filename, options.validate_input);
 
   const auto new_not_in_old = old_set.getMissingFiles(new_set);
   const auto old_not_in_new = new_set.getMissingFiles(old_set);

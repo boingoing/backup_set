@@ -52,7 +52,32 @@ std::vector<BackupSetTestData> backup_set_tests = {
   {"c:\\temp\\another thing.pdf"}},
 };
 
-class BackupSetTest : public TestCase {};
+class BackupSetTest : public TestCase {
+ protected:
+
+  template <bool should_validate = false>
+  void roundtrip(const std::string& str, const std::string& expected) {
+    trace << std::endl << "Attempting to roundtrip a BackupSet from this buffer:" << std::endl;
+    trace << str << std::endl;
+
+    BackupSet read_set;
+    BackupSetReader reader(read_set);
+    if (should_validate) {
+      reader.enableValidation();
+    }
+
+    std::istringstream istr(str);
+    reader.read(istr);
+
+    BackupSetWriter writer(read_set);
+    std::stringstream ostr;
+    writer.write(ostr);
+
+    trace << "Found: " << std::endl << ostr.str() << std::endl;
+    trace << "Expected: " << std::endl << expected << std::endl;
+    assert.equal(ostr.str(), expected);
+  }
+};
 
 TEST_CASE_WITH_DATA(BackupSetTest, tests, BackupSetTestData, backup_set_tests) {
   trace << std::endl << "Finding the missing files between old and new backup sets." << std::endl;
@@ -158,39 +183,31 @@ TEST_CASE_WITH_DATA(BackupSetTest, reader_buffer, BackupSetReaderTestData, backu
   assert.equal(unexpected_found, {});
 }
 
-struct BackupSetRoundtripTestData : TestCaseData {
-  std::vector<FileDescriptor> backup_set;
+struct BackupSetRoundtripTestData : TestCaseDataWithExpectedResult<std::string> {
   std::string str;
-
-  BackupSetRoundtripTestData(std::vector<FileDescriptor> backup_set, std::string str) : backup_set(backup_set), str(str) {}
 };
 
 std::vector<BackupSetRoundtripTestData> backup_set_roundtrip_tests = {
-  {std::vector<FileDescriptor>({
-      {"1111111111111111111111111111111111111111", "c:\\file 1.txt"},
-      {"2222222222222222222222222222222222222222", "c:\\file 2.txt"},
-      {"3333333333333333333333333333333333333333", "c:\\file 3.txt"},
-      {"4444444444444444444444444444444444444444", "c:\\file 4.txt"}}),
-      "1111111111111111111111111111111111111111 c:\\file 1.txt\n"
+  {"", "1111111111111111111111111111111111111111 c:\\file 1.txt\n"
       "2222222222222222222222222222222222222222 c:\\file 2.txt\n"
       "3333333333333333333333333333333333333333 c:\\file 3.txt\n"
       "4444444444444444444444444444444444444444 c:\\file 4.txt\n"},
 };
 
 TEST_CASE_WITH_DATA(BackupSetTest, roundtrip_buffer, BackupSetRoundtripTestData, backup_set_roundtrip_tests) {
-  trace << std::endl << "Attempting to roundtrip a BackupSet from this buffer:" << std::endl;
-  trace << data.str << std::endl;
+  // Expected string should be equal to source string if there are no validation errors.
+  roundtrip<false>(data.str, data.str);
+}
 
-  BackupSet read_set;
-  BackupSetReader reader(read_set);
-  std::istringstream istr(data.str);
-  reader.read(istr);
+std::vector<BackupSetRoundtripTestData> backup_set_roundtrip_validate_tests = {
+  {"1111111111111111111111111111111111111111 c:\\file 1.txt\n"
+      "4444f444F44444444a4444444444A44444e44E44 c:\\file 4.txt\n",
+      "1111111111111111111111111111111111111111 c:\\file 1.txt\n"
+      "222222222222222222222222222222222222222 c:\\file 2.txt\n"
+      "3333333333333333333333333333333333333z33 c:\\file 3.txt\n"
+      "4444f444F44444444a4444444444A44444e44E44 c:\\file 4.txt\n"},
+};
 
-  BackupSetWriter writer(read_set);
-  std::stringstream ostr;
-  writer.write(ostr);
-
-  trace << "Found: " << std::endl << ostr.str() << std::endl;
-  trace << "Expected: " << std::endl << data.str << std::endl;
-  assert.equal(ostr.str(), data.str);
+TEST_CASE_WITH_DATA(BackupSetTest, roundtrip_buffer_validate, BackupSetRoundtripTestData, backup_set_roundtrip_validate_tests) {
+  roundtrip<true>(data.str, data.expected);
 }
